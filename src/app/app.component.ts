@@ -66,8 +66,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.mockDataService.getPlanets('')
   ]).pipe(
     map(([characters, planets]: [any[], any[]]) => [
-      ...characters.map(c => ({ name: c.name, type: 'character' })),
-    ...planets.map(p => ({ name: p.name, type: 'planet' })),
+      ...characters.map(c => ({ name: c.name})),
+    ...planets.map(p => ({ name: p.name })),
     ]),
   );
   
@@ -81,7 +81,7 @@ export class AppComponent implements OnInit, OnDestroy {
     - Subscribe to changes
     - Check the received value using the areAllValuesTrue function and pass them to the isLoading variable. */
     // YOUR CODE STARTS 
-     const loaders$ = combineLatest([
+    const loaders$ = combineLatest([
     this.mockDataService.getCharactersLoader(),
     this.mockDataService.getPlanetLoader(),
   ]);
