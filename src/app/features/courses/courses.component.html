@@ -1,0 +1,8 @@
+<p>courses works!</p>
+<app-courses-list
+  [courses]="courses"
+  [editable]="editable"
+  (showCourse)="onShow($event)"
+  (editCourse)="onEdit($event)"
+  (deleteCourse)="onDelete($event)">
+</app-courses-list>
