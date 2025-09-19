@@ -70,7 +70,7 @@
           <!--Use the name `duration` for the form array.-->
           <input type="number" id="duration" placeholder="Input duration" formControlName="duration" min="0"/>
           <div class="course__duration">
-            {{ minutesToHhMm(duration?.value) }}
+            {{ duration?.value | duration }}
           </div>
         </div>
         <span id="durationErrorMessage" class="text-danger" *ngIf="controlInvalid(duration)">Duration is required.</span>

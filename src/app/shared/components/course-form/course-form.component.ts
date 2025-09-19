@@ -101,12 +101,12 @@ export class CourseFormComponent implements OnInit {
   authorNameById(id: AuthorId): string {
     return this.allAuthors.find(a => a.id === id)?.name ?? id;
   }
-  minutesToHhMm(mins: number | null | undefined): string {
-    const m = Math.max(0, Number(mins ?? 0) | 0);
-    const h = Math.floor(m / 60);
-    const mm = (m % 60).toString().padStart(2, '0');
-    return h ? `${h}h ${mm}m` : `${mm}m`;
-  }
+  // minutesToHhMm(mins: number | null | undefined): string {
+  //   const m = Math.max(0, Number(mins ?? 0) | 0);
+  //   const h = Math.floor(m / 60);
+  //   const mm = (m % 60).toString().padStart(2, '0');
+  //   return h ? `${h}h ${mm}m` : `${mm}m`;
+  // }
 
   trackByAuthorId = (_: number, a: Author) => a.id;
 
