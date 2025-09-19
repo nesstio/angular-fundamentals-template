@@ -1,4 +1,9 @@
 <p>courses works!</p>
+<app-search
+  [placeholder]="'Search by title...'"
+  (search)="onSearch($event)">
+</app-search>
+
 <app-courses-list
   [courses]="courses"
   [editable]="editable"

@@ -18,5 +18,6 @@ export class CoursesComponent {
   onShow(course: any) { console.log('Show:', course); }
   onEdit(course: any) { console.log('Edit:', course); }
   onDelete(course: any) { console.log('Delete:', course); }
+  onSearch(term: string): void {console.log('search:', term);}
 
 }
