@@ -1,0 +1,257 @@
+export class AppComponent implements OnInit, OnDestroy {
+  searchTermByCharacters = new Subject<string>();
+  charactersResults$!: Observable<any>;
+  planetAndCharactersResults$!: Observable<any>;
+  isLoading: boolean = false;
+  subscriptions: Subscription[] = [];
+  
+Subject из RxJS — это поток событий, в который можно вручную «пушить» значения (через .next()).
+Переменная с суффиксом $ — по соглашению так называют Observable.
+
+subscriptions: Subscription[] = [];
+Массив активных подписок.
+
+Каждую подписку добавляют сюда (this.subscriptions.push(...)), а в ngOnDestroy делают отписку 
+(unsubscribe()), чтобы избежать утечек памяти
+---------
+constructor(private mockDataService: MockDataService) {}
+
+Это внедрение зависимости (dependency injection): Angular автоматически создаёт 
+MockDataService и сохраняет его в приватное свойство mockDataService, чтобы ты могла 
+вызывать его методы внутри компонента.
+ 
+--------
+  ngOnInit(): void {
+    this.initLoadingState();
+    this.initCharacterEvents();
+  }
+
+Метод ngOnInit — хук жизненного цикла Angular. Он вызывается один раз после создания компонента.
+
+this.initLoadingState(); → запускает логику отображения лоадера.
+this.initCharacterEvents(); → настраивает обработку поиска персонажей.
+То есть в ngOnInit ты инициализируешь всё, что нужно для работы компонента при старте.
+-----------
+
+  changeCharactersInput(element: any): void {
+    // 1.1. Add functionality to changeCharactersInput method. Changes searchTermByCharacters Subject value on input change.
+    const inputValue: string = element.target.value;
+    // YOUR CODE STARTS HERE
+    this.searchTermByCharacters.next(inputValue);
+    // YOUR CODE ENDS HERE
+  }
+Этот метод реагирует на ввод пользователя в поле поиска.
+element: any — сюда приходит событие из шаблона (input)="changeCharactersInput($event)".
+const inputValue: string = element.target.value; — берём введённый текст.
+this.searchTermByCharacters.next(inputValue); — передаём строку в Subject, 
+чтобы другие части приложения (стрим с debounceTime, filter, switchMap) 
+получили новое значение и запустили API-запрос.
+
+метод просто «пушит» текущее значение инпута в поток поиска.
+--------
+  initCharacterEvents(): void {
+    // 1.2. Add API call on each user input. Use mockDataService.getCharacters - to make get request.
+
+    // 2. Since we don't want to spam our service add filter by input value and do not call API until a user enters at least 3 chars.
+
+    // 3. Add debounce to prevent API calls until user stop typing.
+
+    this.charactersResults$ = this.searchTermByCharacters
+        .pipe(
+          debounceTime(300),
+          filter((term: string) => term.trim().length >= 3),
+          switchMap((term: string) => this.mockDataService.getCharacters(term)));
+        // YOUR CODE STARTS HERE
+
+        // YOUR CODE ENDS HERE
+        
+  }
+  Этот метод настраивает поток для поиска персонажей.
+
+Разбор по шагам:
+
+-this.searchTermByCharacters.pipe(...)
+Берём поток значений, которые приходят из инпута (Subject).
+
+-debounceTime(300)
+Ждём 300 мс после последнего ввода. Если пользователь печатает быстро, запрос отправится только когда он остановится → меньше «спама» запросами.
+
+-filter((term: string) => term.trim().length >= 3)
+Пропускаем дальше только строки длиной 3+ символа. Если меньше — запрос не делаем.
+
+-switchMap((term: string) => this.mockDataService.getCharacters(term))
+На каждый валидный ввод вызываем API getCharacters.
+
+-switchMap отменяет предыдущий запрос, если пользователь ввёл что-то новое. Это важно, чтобы результаты не «перепутались».
+
+Результат
+Всё это сохраняется в charactersResults$. Его можно подписать в шаблоне через | async, и там будут приходить актуальные результаты поиска.
+
+ метод превращает «сырые» строки из инпута в поток готовых данных персонажей с защитой от лишних запросов.
+-------------
+
+  loadCharactersAndPlanet(): void {
+    // 4. On clicking the button 'Load Characters And Planets', it is necessary to process two requests and combine the results of both requests into one result array. As a result, a list with the names of the characters and the names of the planets is displayed on the screen.
+    // Your code should looks like this: this.planetAndCharactersResults$ = /* Your code */
+    // YOUR CODE STARTS HERE
+    this.planetAndCharactersResults$ = forkJoin([
+    this.mockDataService.getCharacters(''),
+    this.mockDataService.getPlanets('')
+  ]).pipe(
+    map(([characters, planets]: [any[], any[]]) => [
+      ...characters.map(c => ({ name: c.name})),
+    ...planets.map(p => ({ name: p.name })),
+    ]),
+  );
+  
+    // YOUR CODE ENDS HERE
+  }
+  Этот метод выполняется при нажатии кнопки «Load Characters And Planets».
+
+Разбор:
+
+forkJoin([...])
+Запускает два запроса параллельно:
+
+this.mockDataService.getCharacters('')
+
+this.mockDataService.getPlanets('')
+forkJoin ждёт, пока оба завершатся, и возвращает массив результатов.
+
+map(([characters, planets]) => [...])
+
+Деструктурируем результаты.
+
+Из каждого массива берём только имена ({ name: ... }).
+
+Объединяем их в один общий массив: сначала персонажи, потом планеты.
+
+this.planetAndCharactersResults$ = ...
+Сохраняем в Observable, чтобы в шаблоне через | async можно было отобразить список имён.
+
+👉 Итог: метод делает два API-запроса одновременно и формирует один
+ массив имён персонажей и планет для вывода на страницу.
+------------------
+
+  initLoadingState(): void {
+    /* 5.1. Let's add loader logic to our page. For each request, we have an observable that contains the state of the request. When we send a request the value is true, when the request is completed, the value becomes false. You can get value data with mockDataService.getCharactersLoader() and mockDataService.getPlanetLoader().
+
+    - Combine the value of each of the streams.
+    - Subscribe to changes
+    - Check the received value using the areAllValuesTrue function and pass them to the isLoading variable. */
+    // YOUR CODE STARTS 
+    const loaders$ = combineLatest([
+    this.mockDataService.getCharactersLoader(),
+    this.mockDataService.getPlanetLoader(),
+  ]);
+
+  const sub = loaders$
+    .pipe(
+      map(flags => this.areAllValuesTrue(flags))
+    )
+    .subscribe(isLoading => {
+      this.isLoading = isLoading;
+    }); 
+
+  this.subscriptions.push(sub);
+    // YOUR CODE ENDS HERE
+  }
+  Этот метод отвечает за показ/скрытие индикатора загрузки.
+
+Разбор:
+
+combineLatest([...])
+Берём два потока-флага:
+
+getCharactersLoader() → true/false во время загрузки персонажей
+
+getPlanetLoader() → true/false во время загрузки планет
+combineLatest создаёт новый поток, где в каждый момент времени есть 
+массив [charactersLoading, planetsLoading].
+
+.pipe(map(flags => this.areAllValuesTrue(flags)))
+Передаём этот массив в функцию areAllValuesTrue, которая вернёт true, 
+только если оба значения true.
+
+.subscribe(isLoading => { this.isLoading = isLoading; })
+Подписываемся на изменения и сохраняем результат в свойство isLoading.
+Это свойство можно использовать в шаблоне для отображения лоадера.
+
+this.subscriptions.push(sub)
+Сохраняем подписку в массив, чтобы потом отписаться в ngOnDestroy и 
+не допустить утечки памяти.
+
+👉 Итог: initLoadingState следит за состоянием обоих запросов и 
+управляет флагом isLoading, чтобы показывать или скрывать индикатор загрузки.
+-----------------
+
+  ngOnDestroy(): void {
+    // 5.2 Unsubscribe from all subscriptions
+    // YOUR CODE STARTS HERE
+     this.subscriptions.forEach(s => s.unsubscribe());
+    // YOUR CODE ENDS HERE
+  }
+  Метод ngOnDestroy — хук жизненного цикла Angular, вызывается при уничтожении компонента.
+Проходим по массиву this.subscriptions, где хранятся все подписки.
+
+Вызываем unsubscribe() у каждой → останавливаем поток данных.
+
+Это предотвращает утечки памяти и ошибки, когда компонент уже уничтожен, а данные продолжают приходить.
+
+👉 Итог: метод аккуратно завершает все подписки при удалении компонента.
+------------------
+
+  areAllValuesTrue(elements: boolean[]): boolean {
+    return elements.every((el) => el);
+  }
+  Эта вспомогательная функция проверяет, что все элементы массива — true.
+
+Параметр: elements: boolean[] — массив булевых значений.
+
+elements.every((el) => el) — метод every возвращает true, 
+если коллбэк вернёт true для каждого элемента массива.
+
+В итоге:
+
+[true, true] → true
+
+[true, false] → false
+
+[] → true (особенность every — пустой массив всегда даёт true).
+
+👉 В твоём коде эта функция нужна, чтобы из двух флагов загрузки 
+(charactersLoader, planetLoader) сделать общий флаг isLoading.
+}
+
+
+
+What is a Stream
+Поток — это, по сути, последовательность значений данных, 
+изменяющихся с течением времени. Это может быть простое приращение чисел, 
+выводимых каждые 6 секунд (0, 1, 2, 3, 4, 5), или координат, выводимых с течением времени,
+ и даже значения данных, введенных в форму или текстов чата, 
+ переданных через веб-сокеты или ответы API. Всё это представляет собой значения данных, 
+ которые будут собираться с течением времени, отсюда и название «поток».
+
+Observable как информационная рассылка. Информационная рассылка — это источник данных 
+ (электронных писем), но пока вы не подпишетесь на неё, вы не будете получать никаких писем.
+  После подписки на новостную рассылку вы начнёте получать поток писем 
+  (то есть ровно шесть на изображении выше) в течение определённого периода времени.
+   Вы будете получать письма, пока не отпишетесь от рассылки.
+
+Observable  это источник данных, но он не генерирует данные, 
+пока вы не подпишетесь. Поэтому мы говорим, что наблюдаемые объекты — ленивые. 
+Подпишитесь на наблюдаемый объект, используя удачно названный 
+метод subscribe(): myObservable.subscribe()
+
+ Наконец, когда вам больше не нужны данные, вы можете отписаться, используя 
+ метод unsubscribe(): myObservable.unsubscribe(). 
+ Это важно для предотвращения утечек памяти. Обратите внимание, 
+ что при использовании объекта Observable, созданного Angular, 
+ отписываться не нужно, поскольку Angular автоматически обрабатывает отписку. 
+
+ Subject это особый тип объекта Observable, позволяющий осуществлять 
+ многоадресную передачу значений нескольким наблюдателям. В то время как 
+ обычные наблюдатели являются одноадресными (каждый подписанный наблюдатель 
+ владеет независимым выполнением объекта Observable), 
+ субъекты являются многоадресными.
