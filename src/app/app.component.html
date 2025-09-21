@@ -1,5 +1,30 @@
-<app-header></app-header>
+<app-header><span>Harry Potter</span>
+  <app-button buttonText="LOGOUT"></app-button></app-header>
 <div class="app-root">
+  <!-- <app-button buttonText="SHOW COURSE" iconName="eye"></app-button>
+  <app-button iconName="trash"></app-button>
+  <app-button buttonText="EDIT" iconName="pencil-alt"></app-button> -->
+
+  <!-- вариант с именем и кнопкой -->
+<!-- <app-header>
+  <span>Harry Potter</span>
+  <app-button buttonText="LOGOUT"></app-button>
+</app-header> -->
+
+<!-- вариант только с кнопкой -->
+<!-- <app-header>
+  <app-button buttonText="LOGIN"></app-button>
+</app-header>
+
+<app-info
+  [title]="'Your List Is Empty'"
+  [text]="'Please use ‘Add New Course’ button to add your first course'">
+  <app-button buttonText="ADD NEW COURSE"></app-button>
+</app-info> -->
+
+<app-courses></app-courses>
+<!-- ------------------------------------------- -->
+
   <!-- Search component -->
   <!--<app-search></app-search>-->
 
@@ -7,7 +32,7 @@
   <!--<app-info></app-info>-->
 
   <!-- Course Card component -->
-  <!--<app-course-card></app-course-card>-->
+  <!-- <app-course-card></app-course-card> -->
 
   <!-- Login Form component -->
   <!--<app-login-form></app-login-form>-->
