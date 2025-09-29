@@ -1,42 +1,60 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class CoursesService {
-    getAll() {
-        // Add your code here
-    }
+    private readonly api = ''; 
 
-    createCourse(course: any) { // replace 'any' with the required interface
-        // Add your code here
-    }
+  constructor(private http: HttpClient) {}
 
-    editCourse(id: string, course: any) { // replace 'any' with the required interface
-        // Add your code here
-    }
+  /** GET /courses/all */
+  getAll(): Observable<any> {
+    return this.http.get(`${this.api}/courses/all`);
+  }
 
-    getCourse(id: string) {
-        // Add your code here
-    }
+  /** POST /courses/add */
+  createCourse(course: any): Observable<any> { // заменишь any на свой интерфейс Course
+    return this.http.post(`${this.api}/courses/add`, course);
+  }
 
-    deleteCourse(id: string) {
-        // Add your code here
-    }
+  /** PUT /courses/{id} */
+  editCourse(id: string, course: any): Observable<any> {
+    return this.http.put(`${this.api}/courses/${id}`, course);
+  }
 
-    filterCourses(value: string) {
-        // Add your code here
-    }
+  /** GET /courses/{id} */
+  getCourse(id: string): Observable<any> {
+    return this.http.get(`${this.api}/courses/${id}`);
+  }
 
-    getAllAuthors() {
-        // Add your code here
-    }
+  /** DELETE /courses/{id} */
+  deleteCourse(id: string): Observable<any> {
+    return this.http.delete(`${this.api}/courses/${id}`);
+  }
 
-    createAuthor(name: string) {
-        // Add your code here
-    }
+  /** GET /courses/filter?title=...  (если на бэке другой ключ, замени 'title') */
+  filterCourses(value: string): Observable<any> {
+    const params = new HttpParams().set('title', value);
+    return this.http.get(`${this.api}/courses/filter`, { params });
+  }
 
-    getAuthorById(id: string) {
-        // Add your code here
-    }
+  // ------- Authors -------
+
+  /** GET /authors/all */
+  getAllAuthors(): Observable<any> {
+    return this.http.get(`${this.api}/authors/all`);
+  }
+
+  /** POST /authors/add  (тело обычно { name }) */
+  createAuthor(name: string): Observable<any> {
+    return this.http.post(`${this.api}/authors/add`, { name });
+  }
+
+  /** GET /authors/{id} */
+  getAuthorById(id: string): Observable<any> {
+    return this.http.get(`${this.api}/authors/${id}`);
+  }
 }

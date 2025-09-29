@@ -11,6 +11,8 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 export class ButtonComponent {
   @Input() buttonText?: string;
   @Input() iconName?: string;
+  
+  @Input() type: 'button' | 'submit' | 'reset' = 'submit';
 
   constructor(library: FaIconLibrary) {
     library.addIconPacks(fas);
@@ -19,7 +21,6 @@ export class ButtonComponent {
   get icon(): IconProp | null {
   return this.iconName ? (['fas', this.iconName] as IconProp) : null;
 }
-
 
   // Use the names for the inputs `buttonText` and `iconName`.
 }
