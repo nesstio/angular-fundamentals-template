@@ -1,22 +1,26 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class CoursesService {
-    private readonly api = ''; 
+    private readonly api = 'http://localhost:4000'; 
 
   constructor(private http: HttpClient) {}
 
   /** GET /courses/all */
   getAll(): Observable<any> {
-    return this.http.get(`${this.api}/courses/all`);
+    return this.http
+      .get<{ successful: boolean; result: any[] }>(`${this.api}/courses/all`)
+      .pipe(
+        map(res => res.result) 
+      );
   }
 
   /** POST /courses/add */
-  createCourse(course: any): Observable<any> { // заменишь any на свой интерфейс Course
+  createCourse(course: any): Observable<any> { // заменить any на свой интерфейс Course????
     return this.http.post(`${this.api}/courses/add`, course);
   }
 
@@ -35,10 +39,14 @@ export class CoursesService {
     return this.http.delete(`${this.api}/courses/${id}`);
   }
 
-  /** GET /courses/filter?title=...  (если на бэке другой ключ, замени 'title') */
+  /** GET /courses/filter?title=...   */
   filterCourses(value: string): Observable<any> {
     const params = new HttpParams().set('title', value);
-    return this.http.get(`${this.api}/courses/filter`, { params });
+    return this.http
+      .get<{ successful: boolean; result: any[] }>(`${this.api}/courses/filter`, { params })
+      .pipe(
+        map(res => res.result) 
+      );
   }
 
   // ------- Authors -------
@@ -48,7 +56,7 @@ export class CoursesService {
     return this.http.get(`${this.api}/authors/all`);
   }
 
-  /** POST /authors/add  (тело обычно { name }) */
+  /** POST /authors/add  */
   createAuthor(name: string): Observable<any> {
     return this.http.post(`${this.api}/authors/add`, { name });
   }

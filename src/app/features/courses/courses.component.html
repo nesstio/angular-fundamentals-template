@@ -5,7 +5,7 @@
 </app-search>
 
 <app-courses-list
-  [courses]="courses"
+  [courses]="(courses$ | async) ?? []"
   [editable]="editable"
   (showCourse)="onShow($event)"
   (editCourse)="onEdit($event)"

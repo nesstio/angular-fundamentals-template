@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, switchMap, tap, finalize } from 'rxjs';
 import { CoursesService } from './courses.service';
 
+import { of } from 'rxjs';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -104,5 +106,22 @@ export class CoursesStoreService {
       finalize(() => this.setLoading(false))
     );
   }
+
+  searchCourses(query: string) {
+    const q = (query ?? '').trim();
+
+    this.setLoading(true);
+
+    const src$ = q
+      ? this.api.filterCourses(q) 
+      : this.api.getAll();        
+
+    return src$.pipe(
+      tap(list => this.courses$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
+}
+
+
 }
 
