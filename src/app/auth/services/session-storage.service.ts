@@ -5,7 +5,7 @@ export const WINDOW = new InjectionToken<Window>('WINDOW', {
   factory: () => window,
 });
 
-const TOKEN = 'SESSION_TOKEN'; // Use this constant for the session storage entry key
+const TOKEN = 'SESSION_TOKEN'; 
 // Add your code here
 
 @Injectable({

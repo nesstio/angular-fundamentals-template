@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { mockedCoursesList, mockedAuthorsList } from '@app/shared/mocks/mocks';
 import { CoursesStoreService } from "../../services/courses-store.service";
+import { UserService } from '../../user/services/user.service';
+
 
 @Component({
   selector: 'app-courses',
@@ -13,10 +15,17 @@ export class CoursesComponent implements OnInit{
 
   editable = true;
 
-  constructor(private store: CoursesStoreService) {}
+  constructor(private store: CoursesStoreService, private userService: UserService) {}
 
   ngOnInit(): void {
     this.store.getAll().subscribe();
+
+    //
+this.userService.getUser().subscribe({
+      next: (data) => console.log('USER DATA:', data),
+      error: (err) => console.error('ERROR:', err)
+    });
+    //
   }
 
 onSearch(term: string) {

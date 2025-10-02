@@ -38,12 +38,13 @@ export class AuthService {
         // POST /auth/login
     login(user: LoginPayload): Observable<void> {
         return this.http.post<LoginResponse>(`${API_URL}/login`, user).pipe(
-        tap(res => {
-            this.session.setToken(res.result);
-            this.isAuthorized$$.next(true);
-        }),
-        tap(() => this.router.navigate(['/courses'])),
-        map(() => void 0)
+            tap(res => {
+                const token = res.result.replace(/^Bearer\s+/i,'').trim();
+                this.session.setToken(token);
+                this.isAuthorized$$.next(true);
+            }),
+            tap(() => this.router.navigate(['/courses'])),
+            map(() => void 0)
         );
     }
 
