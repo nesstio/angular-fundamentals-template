@@ -81,4 +81,7 @@ export class AuthService {
     getLoginUrl(): string {
         return '/login';
     }
+    getToken(): string | null {
+       return this.session.getToken();
+    }
 }

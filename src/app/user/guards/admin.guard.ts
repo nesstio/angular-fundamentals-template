@@ -21,11 +21,16 @@ export class AdminGuard implements CanActivate{
         _route: ActivatedRouteSnapshot,
         _state: RouterStateSnapshot
     ): Observable<boolean | UrlTree> {
-
-        return this.userStore.getUser().pipe(
-            switchMap(() => this.userStore.isAdmin$.pipe(take(1))),
-            map(isAdmin => (isAdmin ? true : this.router.createUrlTree(['/courses']))),
-            catchError(() => of(this.router.createUrlTree(['/courses'])))
-            );
+        return this.userStore.isAdmin$.pipe(
+      take(1),
+      map(isAdmin => (isAdmin ? true : this.router.createUrlTree(['/courses']))),
+      catchError(() => of(this.router.createUrlTree(['/courses'])))
+    );
+    //4
+        // return this.userStore.getUser().pipe(
+        //     switchMap(() => this.userStore.isAdmin$.pipe(take(1))),
+        //     map(isAdmin => (isAdmin ? true : this.router.createUrlTree(['/courses']))),
+        //     catchError(() => of(this.router.createUrlTree(['/courses'])))
+        // );
     }
 }

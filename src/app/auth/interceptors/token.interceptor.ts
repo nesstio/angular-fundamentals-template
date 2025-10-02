@@ -19,9 +19,10 @@ export class TokenInterceptor implements HttpInterceptor {
     private auth: AuthService,
     private router: Router
   ) {}
-
+//#2,3
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = this.auth['session'].getToken(); 
+    // const token = this.auth['session'].getToken(); 
+    const token = this.auth.getToken(); // ✅ используем паблик-метод
     let authReq = req;
     if (token) {
       authReq = req.clone({
@@ -32,7 +33,7 @@ export class TokenInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          this.auth.logout?.();  
+          this.auth.logout();            
           this.router.navigate(['/login']);
         }
         return throwError(() => error);
