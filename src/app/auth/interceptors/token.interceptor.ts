@@ -22,7 +22,7 @@ export class TokenInterceptor implements HttpInterceptor {
 //#2,3
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // const token = this.auth['session'].getToken(); 
-    const token = this.auth.getToken(); // ✅ используем паблик-метод
+    const token = this.auth.getToken(); 
     let authReq = req;
     if (token) {
       authReq = req.clone({

@@ -50,11 +50,12 @@ export class CoursesService {
   // }
   //#1
   filterCourses(value: string): Observable<any[]> {
-    const url = `${this.api}/courses/filter?title=${encodeURIComponent(value)}`;
-    return this.http
-      .get<{ successful: boolean; result: any[] }>(url)
-      .pipe(map(res => res.result));
-  }
+ const params = new HttpParams().set('title', value);
+
+  return this.http
+    .get<{ successful: boolean; result: any[] }>('/courses/filter', { params })
+    .pipe(map(res => res.result));
+}
 
   // ------- Authors -------
 
