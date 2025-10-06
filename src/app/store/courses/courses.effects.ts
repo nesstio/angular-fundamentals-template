@@ -4,13 +4,14 @@ import { CoursesService } from '@app/services/courses.service';
 import * as CoursesActions from '@app/store/courses/courses.actions';
 import { catchError, map, mergeMap, of } from 'rxjs';
 import { Router } from '@angular/router';
+import { CoursesStateFacade } from '@app/store/courses/courses.facade';
 
 @Injectable()
 export class CoursesEffects {
     constructor(
         private actions$: Actions,
         private coursesService: CoursesService,
-        private coursesStateFacade: any,
+        private coursesStateFacade: CoursesStateFacade,
         private router: Router
     ) {}
 
