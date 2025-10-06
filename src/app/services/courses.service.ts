@@ -57,6 +57,7 @@ export class CoursesService {
       .pipe(map(res => res.result));
 }
 
+
   // ------- Authors -------
 
   /** GET /authors/all */
