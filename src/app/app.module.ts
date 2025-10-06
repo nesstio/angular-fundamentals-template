@@ -18,6 +18,12 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptor } from './auth/interceptors/token.interceptor';
 
 
+// NgRx
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { reducers, effects } from '@app/store';
+
+
 @NgModule({
   declarations: [AppComponent, ],
   imports: [
@@ -26,6 +32,8 @@ import { TokenInterceptor } from './auth/interceptors/token.interceptor';
     FontAwesomeModule,
     AppRoutingModule,
     HttpClientModule,
+    StoreModule.forRoot(reducers),
+    EffectsModule.forRoot(effects),
   ],
   providers: [
     AuthorizedGuard, 
