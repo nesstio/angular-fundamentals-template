@@ -11,7 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule
   ],
   providers: [
-    SessionStorageService,
+    // SessionStorageService,
     AuthService,
   ]
 })

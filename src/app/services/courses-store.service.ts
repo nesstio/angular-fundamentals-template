@@ -1,42 +1,127 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, switchMap, tap, finalize } from 'rxjs';
+import { CoursesService } from './courses.service';
+
+import { of } from 'rxjs';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class CoursesStoreService {
-    getAll(){
-        // Add your code here
-    }
+  // ----- state -----
+  private courses$$ = new BehaviorSubject<any[]>([]);
+  private authors$$ = new BehaviorSubject<any[]>([]);
+  private isLoading$$ = new BehaviorSubject<boolean>(false); 
+  // ----- selectors -----
+  public courses$ = this.courses$$.asObservable();
+  public authors$ = this.authors$$.asObservable();
+  public isLoading$ = this.isLoading$$.asObservable();       
+  constructor(private api: CoursesService) {}
 
-    createCourse(course: any) { // replace 'any' with the required interface
-        // Add your code here
-    }
+  private setLoading(v: boolean) { this.isLoading$$.next(v); } 
 
-    getCourse(id: string) {
-        // Add your code here
-    }
+  // ===== Courses =====
 
-    editCourse(id: string, course: any) { // replace 'any' with the required interface
-        // Add your code here
-    }
+  /** GET /courses/all */
+  getAll(): Observable<any> {
+    this.setLoading(true);
+    return this.api.getAll().pipe(
+      tap(list => this.courses$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
+  }
 
-    deleteCourse(id: string) {
-        // Add your code here
-    }
+  /** POST /courses/add */
+  createCourse(course: any): Observable<any> {
+    this.setLoading(true);
+    return this.api.createCourse(course).pipe(
+      switchMap(() => this.api.getAll()),
+      tap(list => this.courses$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
+  }
 
-    filterCourses(value: string) {
-        // Add your code here
-    }
+  /** PUT /courses/{id} */
+  editCourse(id: string, course: any): Observable<any> {
+    this.setLoading(true);
+    return this.api.editCourse(id, course).pipe(
+      switchMap(() => this.api.getAll()),
+      tap(list => this.courses$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
+  }
 
-    getAllAuthors() {
-        // Add your code here
-    }
+  /** GET /courses/{id} */
+  getCourse(id: string): Observable<any> {
+    this.setLoading(true);
+    return this.api.getCourse(id).pipe(
+      finalize(() => this.setLoading(false))
+    );
+  }
 
-    createAuthor(name: string) {
-        // Add your code here
-    }
+  /** DELETE /courses/{id} */
+  deleteCourse(id: string): Observable<any> {
+    this.setLoading(true);
+    return this.api.deleteCourse(id).pipe(
+      switchMap(() => this.api.getAll()),
+      tap(list => this.courses$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
+  }
 
-    getAuthorById(id: string) {
-        // Add your code here
-    }
+  /** GET /courses/filter?title=... */
+  filterCourses(value: string): Observable<any> {
+    this.setLoading(true);
+    return this.api.filterCourses(value).pipe(
+      tap(list => this.courses$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
+  }
+
+  // ===== Authors =====
+
+  /** GET /authors/all */
+  getAllAuthors(): Observable<any> {
+    this.setLoading(true);
+    return this.api.getAllAuthors().pipe(
+      tap(list => this.authors$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
+  }
+
+  /** POST /authors/add */
+  createAuthor(name: string): Observable<any> {
+    this.setLoading(true);
+    return this.api.createAuthor(name).pipe(
+      switchMap(() => this.api.getAllAuthors()),
+      tap(list => this.authors$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
+  }
+
+  /** GET /authors/{id}  */
+  getAuthorById(id: string): Observable<any> {
+    this.setLoading(true);
+    return this.api.getAuthorById(id).pipe(
+      finalize(() => this.setLoading(false))
+    );
+  }
+
+  searchCourses(query: string) {
+    const q = (query ?? '').trim();
+
+    this.setLoading(true);
+
+    const src$ = q
+      ? this.api.filterCourses(q) 
+      : this.api.getAll();        
+
+    return src$.pipe(
+      tap(list => this.courses$$.next(list)),
+      finalize(() => this.setLoading(false))
+    );
 }
+
+
+}
+

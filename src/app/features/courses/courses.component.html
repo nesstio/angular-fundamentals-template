@@ -1,0 +1,13 @@
+<p>courses works!</p>
+<app-search
+  [placeholder]="'Search by title...'"
+  (search)="onSearch($event)">
+</app-search>
+
+<app-courses-list
+  [courses]="(courses$ | async) ?? []"
+  [editable]="editable"
+  (showCourse)="onShow($event)"
+  (editCourse)="onEdit($event)"
+  (deleteCourse)="onDelete($event)">
+</app-courses-list>
