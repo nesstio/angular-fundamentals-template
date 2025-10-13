@@ -1,6 +1,15 @@
 import { createAction, props } from '@ngrx/store';
 import { CoursesConstants } from '@app/store/courses/courses.constants';
 
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  creationDate: string;  
+  duration: number;      
+  authors: string[];     
+}
+
 // Add your code here
 export const requestAllCourses = createAction(
   CoursesConstants.REQUEST_ALL_COURSES
@@ -8,7 +17,7 @@ export const requestAllCourses = createAction(
 
 export const requestAllCoursesSuccess = createAction(
   CoursesConstants.REQUEST_ALL_COURSES_SUCCESS,
-  props<{ courses: any[] }>()
+  props<{ courses: Course[] }>()
 );
 
 export const requestAllCoursesFail = createAction(
@@ -24,7 +33,7 @@ export const requestSingleCourse = createAction(
 
 export const requestSingleCourseSuccess = createAction(
   CoursesConstants.REQUEST_SINGLE_COURSE_SUCCESS,
-  props<{ course: any }>()
+  props<{ course: Course }>()
 );
 
 export const requestSingleCourseFail = createAction(
@@ -39,7 +48,7 @@ export const requestFilteredCourses = createAction(
 
 export const requestFilteredCoursesSuccess = createAction(
   CoursesConstants.REQUEST_FILTERED_COURSES_SUCCESS,
-  props<{ courses: any[] }>()
+  props<{ courses: Course[] }>()
 );
 
 export const requestFilteredCoursesFail = createAction(
@@ -63,12 +72,12 @@ export const requestDeleteCourseFail = createAction(
 // Request edit course
 export const requestEditCourse = createAction(
   CoursesConstants.REQUEST_EDIT_COURSE,
-  props<{ id: string; course: any }>()
+  props<{ id: string; course: Course }>()
 );
 
 export const requestEditCourseSuccess = createAction(
   CoursesConstants.REQUEST_EDIT_COURSE_SUCCESS,
-  props<{ course: any }>()
+  props<{ course: Course }>()
 );
 
 export const requestEditCourseFail = createAction(
@@ -78,12 +87,12 @@ export const requestEditCourseFail = createAction(
 // Request create course
 export const requestCreateCourse = createAction(
   CoursesConstants.REQUEST_CREATE_COURSE,
-  props<{ course: any }>()
+  props<{ course: Course }>()
 );
 
 export const requestCreateCourseSuccess = createAction(
   CoursesConstants.REQUEST_CREATE_COURSE_SUCCESS,
-  props<{ course: any }>()
+  props<{ course: Course }>()
 );
 
 export const requestCreateCourseFail = createAction(

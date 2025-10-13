@@ -93,18 +93,31 @@ export class CoursesEffects {
         )
     );
     redirectToTheCoursesPage$ = createEffect(
-    () =>
-        this.actions$.pipe(
-        ofType(
-            CoursesActions.requestCreateCourseSuccess,
-            CoursesActions.requestEditCourseSuccess,
-            CoursesActions.requestSingleCourseFail
-        ),
-        map(() => {
-            this.router.navigate(['/courses']);
-        })
-        ),
-    { dispatch: false }
+        () =>
+            this.actions$.pipe(
+            ofType(
+                CoursesActions.requestCreateCourseSuccess,
+                CoursesActions.requestEditCourseSuccess,
+                CoursesActions.requestSingleCourseFail
+            ),
+            map(() => {
+                this.router.navigate(['/courses']);
+            })
+            ),
+        { dispatch: false }
     );
-    
+    deleteCourse$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(CoursesActions.requestDeleteCourse),
+                mergeMap(({ id }) =>
+                this.coursesService.deleteCourse(id).pipe(
+                    map(() => CoursesActions.requestAllCourses()),
+                    catchError((error) =>
+                    of(CoursesActions.requestDeleteCourseFail({ error: error.message })))
+                )
+            )
+        )
+    );
+        
 }

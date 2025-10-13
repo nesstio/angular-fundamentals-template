@@ -1,29 +1,41 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as CoursesActions from '@app/store/courses/courses.actions';
 
-// Add your code here
 export const coursesFeatureKey = 'courses';
 
-
 export interface CoursesState {
-    // Add your code here
-    allCourses: any[];            
-    course: any | null;           
-    isAllCoursesLoading: boolean; 
-    isSingleCourseLoading: boolean; 
-    isSearchState: boolean;       
-    errorMessage: string | null;  
+  allCourses: any[];
+  course: any | null;
+  isAllCoursesLoading: boolean;
+  isSingleCourseLoading: boolean;
+  isSearchState: boolean;
+  errorMessage: string | null;
 }
 
 export const initialState: CoursesState = {
-    // Add your code here
-    allCourses: [],
-    course: null,
-    isAllCoursesLoading: false,
-    isSingleCourseLoading: false,
-    isSearchState: false,
-    errorMessage: null,
+  allCourses: [],
+  course: null,
+  isAllCoursesLoading: false,
+  isSingleCourseLoading: false,
+  isSearchState: false,
+  errorMessage: null,
 };
+
+/** ----------const---------- */
+type Patch = Partial<CoursesState>;
+
+const CLEAR_ERROR: Patch = { errorMessage: null };
+
+const ALL_LOADING_ON: Patch = { isAllCoursesLoading: true };
+const ALL_LOADING_OFF: Patch = { isAllCoursesLoading: false };
+
+const SINGLE_LOADING_ON: Patch = { isSingleCourseLoading: true };
+const SINGLE_LOADING_OFF: Patch = { isSingleCourseLoading: false };
+
+const SEARCH_ON: Patch = { isSearchState: true };
+const SEARCH_OFF: Patch = { isSearchState: false };
+
+/** ---------------------------------------------------- */
 
 export const coursesReducer = createReducer(
   initialState,
@@ -31,69 +43,69 @@ export const coursesReducer = createReducer(
   // --- All courses ---
   on(CoursesActions.requestAllCourses, (state) => ({
     ...state,
-    isAllCoursesLoading: true,
-    isSearchState: false,
-    errorMessage: null,
+    ...ALL_LOADING_ON,
+    ...SEARCH_OFF,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestAllCoursesSuccess, (state, { courses }) => ({
     ...state,
     allCourses: courses,
-    isAllCoursesLoading: false,
-    errorMessage: null,
+    ...ALL_LOADING_OFF,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestAllCoursesFail, (state, { error }) => ({
     ...state,
-    isAllCoursesLoading: false,
+    ...ALL_LOADING_OFF,
     errorMessage: error,
   })),
 
   // --- Single course ---
   on(CoursesActions.requestSingleCourse, (state) => ({
     ...state,
-    isSingleCourseLoading: true,
-    errorMessage: null,
+    ...SINGLE_LOADING_ON,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestSingleCourseSuccess, (state, { course }) => ({
     ...state,
     course,
-    isSingleCourseLoading: false,
-    errorMessage: null,
+    ...SINGLE_LOADING_OFF,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestSingleCourseFail, (state, { error }) => ({
     ...state,
-    isSingleCourseLoading: false,
+    ...SINGLE_LOADING_OFF,
     errorMessage: error,
   })),
 
   // --- Filtered courses ---
   on(CoursesActions.requestFilteredCourses, (state) => ({
     ...state,
-    isAllCoursesLoading: true,
-    isSearchState: true,
-    errorMessage: null,
+    ...ALL_LOADING_ON,
+    ...SEARCH_ON,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestFilteredCoursesSuccess, (state, { courses }) => ({
     ...state,
     allCourses: courses,
-    isAllCoursesLoading: false,
-    isSearchState: true,
-    errorMessage: null,
+    ...ALL_LOADING_OFF,
+    ...SEARCH_ON,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestFilteredCoursesFail, (state, { error }) => ({
     ...state,
-    isAllCoursesLoading: false,
-    isSearchState: true,
+    ...ALL_LOADING_OFF,
+    ...SEARCH_ON,
     errorMessage: error,
   })),
 
   // --- Delete course ---
   on(CoursesActions.requestDeleteCourse, (state) => ({
     ...state,
-    errorMessage: null,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestDeleteCourseSuccess, (state) => ({
     ...state,
-    errorMessage: null,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestDeleteCourseFail, (state, { error }) => ({
     ...state,
@@ -103,12 +115,12 @@ export const coursesReducer = createReducer(
   // --- Edit course ---
   on(CoursesActions.requestEditCourse, (state) => ({
     ...state,
-    errorMessage: null,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestEditCourseSuccess, (state, { course }) => ({
     ...state,
     course,
-    errorMessage: null,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestEditCourseFail, (state, { error }) => ({
     ...state,
@@ -118,12 +130,12 @@ export const coursesReducer = createReducer(
   // --- Create course ---
   on(CoursesActions.requestCreateCourse, (state) => ({
     ...state,
-    errorMessage: null,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestCreateCourseSuccess, (state, { course }) => ({
     ...state,
     course,
-    errorMessage: null,
+    ...CLEAR_ERROR,
   })),
   on(CoursesActions.requestCreateCourseFail, (state, { error }) => ({
     ...state,
@@ -131,5 +143,5 @@ export const coursesReducer = createReducer(
   }))
 );
 
-
-export const reducer = (state: CoursesState, action: Action): CoursesState => coursesReducer(state, action);
+export const reducer = (state: CoursesState | undefined, action: Action): CoursesState =>
+  coursesReducer(state ?? initialState, action);
